@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "../src/Poetry.sol";
 
-contract CounterTest is Test {
-    Counter public counter;
+contract PoetryTest is Test {
+    Poetry public poetry;
 
     function setUp() public {
         poetry = new Poetry();
