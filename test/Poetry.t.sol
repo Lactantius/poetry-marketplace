@@ -117,4 +117,14 @@ contract PoetryTest is Test {
         vm.prank(buyer);
         poetry.executeSale{value: price}(id);
     }
+
+    function testFailPoemNotForSale() public {
+        vm.prank(rando);
+        uint256 price = .5 ether;
+        uint256 id = poetry.createPoem("This is a poem.", 0);
+        vm.prank(owner);
+        poetry.approvePoem(id);
+        vm.prank(buyer);
+        poetry.executeSale{value: 0 ether}(id);
+    }
 }

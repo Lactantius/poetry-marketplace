@@ -50,8 +50,6 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         string memory poemText,
         uint256 price
     ) private {
-        //require(msg.value == listingFee);
-        require(price > 0);
         idToPoem[poemId] = Poem(
             poemId,
             poemText,
@@ -102,6 +100,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
             idToPoem[poemId].approved,
             "This poem is not approved for sale."
         );
+        require(idToPoem[poemId].price > 0, "This poem is not for sale.");
         uint256 price = idToPoem[poemId].price;
         require(msg.value == price, "Price did not match asking price.");
 
