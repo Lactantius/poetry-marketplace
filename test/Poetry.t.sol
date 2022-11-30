@@ -52,6 +52,14 @@ contract PoetryTest is Test {
         assert(poetry.getPoemById(1).approved);
     }
 
+    function testApprovePoemRestricted() public {
+        assertFalse(poetry.getPoemById(0).approved);
+        vm.prank(rando);
+        vm.expectRevert();
+        poetry.approvePoem(1);
+        assertFalse(poetry.getPoemById(0).approved);
+    }
+
     // New Poem
 
     function testCreatePoem() public {
@@ -92,14 +100,6 @@ contract PoetryTest is Test {
     }
 
     // Access Controls
-
-    function testApprovePoemRestricted() public {
-        assertFalse(poetry.getPoemById(0).approved);
-        vm.prank(rando);
-        vm.expectRevert();
-        poetry.approvePoem(1);
-        assertFalse(poetry.getPoemById(0).approved);
-    }
 
     // Transfers
 

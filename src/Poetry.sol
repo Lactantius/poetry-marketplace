@@ -16,8 +16,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         uint256 poemId;
         string poemText;
         address payable author;
-        uint256 price;
-        bool currentlyListed;
+        uint256 price; // Price of 0 means not for sale
         bool approved;
     }
 
@@ -26,7 +25,6 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         string poemText,
         address author,
         uint256 price,
-        bool currentlyListed,
         bool approved
     );
 
@@ -55,18 +53,10 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
             poemText,
             payable(msg.sender),
             price,
-            true,
             false
         );
 
-        emit PoemListedSuccess(
-            poemId,
-            poemText,
-            msg.sender,
-            price,
-            true,
-            false
-        );
+        emit PoemListedSuccess(poemId, poemText, msg.sender, price, false);
     }
 
     function getAllPoems() public view returns (Poem[] memory) {
