@@ -95,6 +95,14 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         return poems;
     }
 
+    function setPrice(uint256 poemId, uint256 price) public {
+        require(
+            ownerOf(poemId) == msg.sender,
+            "Only the owner can set the price."
+        );
+        idToPoem[poemId].price = price;
+    }
+
     function executeSale(uint256 poemId) public payable {
         require(
             idToPoem[poemId].approved,

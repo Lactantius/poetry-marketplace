@@ -74,6 +74,23 @@ contract PoetryTest is Test {
         assertEq(poetry.getLatestPoem().poemText, "New poem");
     }
 
+    // Pricing
+
+    function testSetPrice() public {
+        vm.prank(rando);
+        uint256 id = poetry.createPoem("This is a poem", .5 ether);
+        vm.prank(rando);
+        poetry.setPrice(id, .2 ether);
+        assertEq(poetry.getPoemById(id).price, .2 ether);
+    }
+
+    function testFailNonOwnerSetsPrice() public {
+        vm.prank(rando);
+        uint256 id = poetry.createPoem("This is a poem", .5 ether);
+        vm.prank(buyer);
+        poetry.setPrice(id, .2 ether);
+    }
+
     // Access Controls
 
     function testApprovePoemRestricted() public {
