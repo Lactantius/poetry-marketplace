@@ -3,9 +3,10 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract Poetry is ERC721, Ownable {
+contract Poetry is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _poemIds;
     Counters.Counter private _poemsSold;
@@ -14,8 +15,6 @@ contract Poetry is ERC721, Ownable {
     struct Poem {
         uint256 poemId;
         string poemText;
-        address payable owner;
-        address payable seller;
         address payable author;
         uint256 price;
         bool currentlyListed;
@@ -25,8 +24,6 @@ contract Poetry is ERC721, Ownable {
     event PoemListedSuccess(
         uint256 indexed poemId,
         string poemText,
-        address owner,
-        address seller,
         address author,
         uint256 price,
         bool currentlyListed,
@@ -58,8 +55,6 @@ contract Poetry is ERC721, Ownable {
         idToPoem[poemId] = Poem(
             poemId,
             poemText,
-            payable(address(this)),
-            payable(msg.sender),
             payable(msg.sender),
             price,
             true,
@@ -71,8 +66,6 @@ contract Poetry is ERC721, Ownable {
         emit PoemListedSuccess(
             poemId,
             poemText,
-            address(this),
-            msg.sender,
             msg.sender,
             price,
             true,
@@ -93,37 +86,15 @@ contract Poetry is ERC721, Ownable {
         return poems;
     }
 
-    function getMyPoems() public view returns (Poem[] memory) {
-        // First get the number of poems owned.
-        uint256 totalPoemCount = _poemIds.current();
-        uint256 poemCount = 0;
-        uint256 currentIndex = 0;
-        for (uint256 i = 0; i < totalPoemCount; i++) {
-            if (
-                idToPoem[i + 1].owner == msg.sender ||
-                idToPoem[i + 1].seller == msg.sender
-            ) {
-                poemCount++;
-            }
-        }
-        return _getPoemsByAddress(msg.sender, poemCount);
-    }
-
-    function _getPoemsByAddress(
-        address addr,
-        uint256 n
-    ) private view returns (Poem[] memory) {
-        uint256 currentIndex = 0;
-        Poem[] memory poems = new Poem[](n);
-        for (uint256 i = 0; i < n; i++) {
-            if (
-                idToPoem[i + 1].owner == addr || idToPoem[i + 1].seller == addr
-            ) {
-                uint256 currentId = i + 1;
-                Poem storage currentPoem = idToPoem[currentId];
-                poems[currentIndex] = currentPoem;
-                currentIndex++;
-            }
+    function getPoemsByAddress(
+        address addr
+    ) public view returns (Poem[] memory) {
+        uint256 balance = balanceOf(addr);
+        Poem[] memory poems = new Poem[](balance);
+        for (uint256 i = 0; i < balance; i++) {
+            Poem memory poem = idToPoem[tokenOfOwnerByIndex(addr, i)];
+            poems[i] = poem;
+            i++;
         }
         return poems;
     }
@@ -134,14 +105,13 @@ contract Poetry is ERC721, Ownable {
             "This poem is not approved for sale."
         );
         uint256 price = idToPoem[poemId].price;
-        address seller = idToPoem[poemId].seller;
         require(msg.value == price, "Price did not match asking price.");
 
         _transfer(address(this), msg.sender, poemId);
         approve(address(this), poemId);
 
         payable(owner()).transfer(listingFee);
-        payable(seller).transfer(msg.value);
+        payable(ownerOf(poemId)).transfer(msg.value);
     }
 
     function updateListingFee(uint256 _listingFee) public payable onlyOwner {
@@ -166,5 +136,22 @@ contract Poetry is ERC721, Ownable {
 
     function getPoemCount() public view returns (uint256) {
         return _poemIds.current();
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId,
+        uint256 batchSize
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }

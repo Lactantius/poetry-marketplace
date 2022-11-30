@@ -55,6 +55,7 @@ contract PoetryTest is Test {
         vm.prank(rando);
         uint256 id = poetry.createPoem("This is a poem.", .5 ether);
         assertEq(poetry.getPoemById(id).poemText, "This is a poem.");
+        assertEq(poetry.ownerOf(id), rando);
     }
 
     // Getter Functions
@@ -95,7 +96,12 @@ contract PoetryTest is Test {
         vm.prank(owner);
         poetry.approvePoem(id);
         vm.prank(buyer);
-        poetry.executeSale(id);
+        vm.mockCall(
+            address(poetry),
+            abi.encodeWithSelector(poetry.executeSale.selector, id, .5 ether),
+            abi.encode(false)
+        );
+        assertEq(poetry.ownerOf(id), buyer);
     }
 
     function testFailSellUnapprovedPoem() public {
