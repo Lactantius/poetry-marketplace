@@ -28,6 +28,8 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         bool approved
     );
 
+    event PoemPriceSet(uint256 indexed poemId, uint256 price);
+
     mapping(uint256 => Poem) private idToPoem;
 
     constructor() ERC721("Poetry", "POEM") {}
@@ -91,6 +93,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
             "Only the owner can set the price."
         );
         idToPoem[poemId].price = price;
+        emit PoemPriceSet(poemId, price);
     }
 
     function executeSale(uint256 poemId) public payable {
