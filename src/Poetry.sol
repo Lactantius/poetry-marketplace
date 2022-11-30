@@ -45,6 +45,7 @@ contract Poetry is ERC721, Ownable {
         uint256 newPoemId = _poemIds.current();
         _safeMint(msg.sender, newPoemId);
         createListedPoem(newPoemId, poemText, price);
+        return newPoemId;
     }
 
     function createListedPoem(
@@ -52,7 +53,7 @@ contract Poetry is ERC721, Ownable {
         string memory poemText,
         uint256 price
     ) private {
-        require(msg.value == listingFee);
+        //require(msg.value == listingFee);
         require(price > 0);
         idToPoem[poemId] = Poem(
             poemId,
