@@ -61,8 +61,6 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
             false
         );
 
-        _transfer(msg.sender, address(this), poemId);
-
         emit PoemListedSuccess(
             poemId,
             poemText,
@@ -127,7 +125,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
     }
 
     function getLatestPoem() public view returns (Poem memory) {
-        return idToPoem[_poemIds.current()];
+        return idToPoem[_poemIds.current() - 1];
     }
 
     function getPoemById(uint256 poemId) public view returns (Poem memory) {
