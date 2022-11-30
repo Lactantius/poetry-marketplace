@@ -105,11 +105,12 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         uint256 price = idToPoem[poemId].price;
         require(msg.value == price, "Price did not match asking price.");
 
-        _transfer(address(this), msg.sender, poemId);
+        address originalOwner = ownerOf(poemId);
+        _transfer(originalOwner, msg.sender, poemId);
         approve(address(this), poemId);
 
         payable(owner()).transfer(listingFee);
-        payable(ownerOf(poemId)).transfer(msg.value);
+        payable(originalOwner).transfer(msg.value - listingFee);
     }
 
     function updateListingFee(uint256 _listingFee) public payable onlyOwner {

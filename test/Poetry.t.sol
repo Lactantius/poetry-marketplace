@@ -9,13 +9,16 @@ contract PoetryTest is Test {
     Poetry public poetry;
 
     address internal owner = msg.sender;
-    address internal constant rando = address(1);
-    address internal constant buyer = address(2);
+    address internal constant rando = address(100);
+    address internal constant buyer = address(101);
 
     function setUp() public {
         vm.label(owner, "Owner");
+        vm.deal(owner, 10 ether);
         vm.label(rando, "Rando");
+        vm.deal(rando, 10 ether);
         vm.label(buyer, "Buyer");
+        vm.deal(buyer, 10 ether);
         vm.prank(owner);
         poetry = new Poetry();
         vm.prank(rando);
@@ -85,22 +88,33 @@ contract PoetryTest is Test {
 
     function testExecuteSale() public {
         vm.prank(rando);
-        uint256 id = poetry.createPoem("This is a poem.", .5 ether);
+        uint256 price = .5 ether;
+        uint256 id = poetry.createPoem("This is a poem.", price);
         vm.prank(owner);
         poetry.approvePoem(id);
         vm.prank(buyer);
-        vm.mockCall(
-            address(poetry),
-            abi.encodeWithSelector(poetry.executeSale.selector, id, .5 ether),
-            abi.encode(false)
-        );
+        poetry.executeSale{value: price}(id);
         assertEq(poetry.ownerOf(id), buyer);
+        assertEq(buyer.balance, 10 ether - price);
+        assertEq(rando.balance, 10 ether + price - poetry.getListingFee());
+        assertEq(owner.balance, 10 ether + poetry.getListingFee());
+    }
+
+    function testFailInsufficientFundsForSale() public {
+        vm.prank(rando);
+        uint256 price = .5 ether;
+        uint256 id = poetry.createPoem("This is a poem.", price);
+        vm.prank(owner);
+        poetry.approvePoem(id);
+        vm.prank(buyer);
+        poetry.executeSale{value: price - 1}(id);
     }
 
     function testFailSellUnapprovedPoem() public {
         vm.prank(rando);
-        uint256 id = poetry.createPoem("This is a poem.", .5 ether);
+        uint256 price = .5 ether;
+        uint256 id = poetry.createPoem("This is a poem.", price);
         vm.prank(buyer);
-        poetry.executeSale(id);
+        poetry.executeSale{value: price}(id);
     }
 }
