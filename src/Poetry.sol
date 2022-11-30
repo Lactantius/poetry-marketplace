@@ -38,8 +38,8 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         string memory poemText,
         uint256 price
     ) public payable returns (uint256) {
-        _poemIds.increment();
         uint256 newPoemId = _poemIds.current();
+        _poemIds.increment();
         _safeMint(msg.sender, newPoemId);
         createListedPoem(newPoemId, poemText, price);
         return newPoemId;
@@ -132,10 +132,6 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
 
     function getPoemById(uint256 poemId) public view returns (Poem memory) {
         return idToPoem[poemId];
-    }
-
-    function getPoemCount() public view returns (uint256) {
-        return _poemIds.current();
     }
 
     // The following functions are overrides required by Solidity.

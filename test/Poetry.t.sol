@@ -60,15 +60,8 @@ contract PoetryTest is Test {
 
     // Getter Functions
 
-    function testGetPoemCount() public {
-        assertEq(poetry.getPoemCount(), 1);
-        vm.prank(rando);
-        poetry.createPoem("This is a poem.", .5 ether);
-        assertEq(poetry.getPoemCount(), 2);
-    }
-
     function testGetPoemById() public {
-        assertEq(poetry.getPoemById(1).poemText, "Test poem");
+        assertEq(poetry.getPoemById(0).poemText, "Test poem");
     }
 
     function testGetLatestPoem() public {
@@ -81,11 +74,11 @@ contract PoetryTest is Test {
     // Access Controls
 
     function testApprovePoemRestricted() public {
-        assertFalse(poetry.getPoemById(1).approved);
+        assertFalse(poetry.getPoemById(0).approved);
         vm.prank(rando);
         vm.expectRevert();
         poetry.approvePoem(1);
-        assertFalse(poetry.getPoemById(1).approved);
+        assertFalse(poetry.getPoemById(0).approved);
     }
 
     // Transfers
