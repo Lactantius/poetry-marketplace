@@ -88,7 +88,7 @@ contract PoetryTest is Test {
             poetry.createPoem("New poem", .5 ether);
         }
         vm.stopPrank();
-        console.log(poetry.getAllPoems());
+        //console.log(poetry.getAllPoems());
     }
 
     // Pricing
