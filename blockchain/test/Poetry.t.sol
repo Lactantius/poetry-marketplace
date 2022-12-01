@@ -82,6 +82,15 @@ contract PoetryTest is Test {
         assertEq(poetry.getLatestPoem().poemText, "New poem");
     }
 
+    function testGetAllPoems() public {
+        vm.startPrank(rando);
+        for (uint8 i = 0; i < 10; i++) {
+            poetry.createPoem("New poem", .5 ether);
+        }
+        vm.stopPrank();
+        console(poetry.getAllPoems());
+    }
+
     // Pricing
 
     function testSetPrice() public {
