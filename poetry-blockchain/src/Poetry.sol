@@ -74,9 +74,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
         return poems;
     }
 
-    function getPoemsByAddress(
-        address addr
-    ) public view returns (Poem[] memory) {
+    function getPoemsByOwner(address addr) public view returns (Poem[] memory) {
         uint256 balance = balanceOf(addr);
         Poem[] memory poems = new Poem[](balance);
         for (uint256 i = 0; i < balance; i++) {

@@ -88,7 +88,17 @@ contract PoetryTest is Test {
             poetry.createPoem("New poem", .5 ether);
         }
         vm.stopPrank();
-        //console.log(poetry.getAllPoems());
+        assertEq(poetry.getAllPoems().length, 11);
+    }
+
+    function testGetPoemsByOwner() public {
+        vm.startPrank(buyer);
+        for (uint8 i = 0; i < 10; i++) {
+            poetry.createPoem("New poem", .5 ether);
+        }
+        vm.stopPrank();
+        assertEq(poetry.getPoemsByOwner(buyer).length, 10);
+        assertEq(poetry.getPoemsByOwner(rando).length, 1);
     }
 
     // Pricing
