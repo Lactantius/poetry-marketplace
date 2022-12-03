@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 contract Poetry is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _poemIds;
-    Counters.Counter private _poemsSold;
     uint256 listingFee = 0.01 ether;
 
     struct Poem {
@@ -29,6 +28,8 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
     );
 
     event PoemPriceSet(uint256 indexed poemId, uint256 price);
+
+    event ListingFeeUpdated(uint256 listingFee);
 
     mapping(uint256 => Poem) private idToPoem;
 
@@ -113,6 +114,7 @@ contract Poetry is ERC721, ERC721Enumerable, Ownable {
 
     function updateListingFee(uint256 _listingFee) public payable onlyOwner {
         listingFee = _listingFee;
+        emit ListingFeeUpdated(_listingFee);
     }
 
     function getListingFee() public view returns (uint256) {
