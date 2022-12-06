@@ -1,10 +1,10 @@
 import styles from "../styles/Home.module.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount } from "wagmi";
+import { useAccount, usePrepareContractWrite, useContractWrite, useWaitForTransaction } from "wagmi";
 import { useState } from "react";
+//import { Contract } from "alchemy-sdk";
 import Panel from "../components/panels";
 import Section from "../layout/section";
-import alchemy from "../utils/alchemy";
 import abi from "../utils/poetry.json";
 
 interface CreatePoemVals {
@@ -19,15 +19,23 @@ export default function Home() {
   } as CreatePoemVals);
 
   const contractAddress = "0x7eC3A87CcA0bac08514e698Bd503E43C5F175bce";
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
-  const createPoem = async (text, price) => {
-    const create = new alchemy.Contract(contractAddress, abi, address)
-      .createPoem;
-    console.log("Creating poem...");
-    const poemTxn = await create((poemText = text), (price = price));
-  };
+  const { config } = usePrepareContractWrite({
+    address: contractAddress,
+    abi: abi.filter(method => method["name"] === "createPoem"),
+  })
+  const { data, write } = useContractWrite(config);
 
+  const { isLoading, isSuccess } = useWaitForTransaction({ hash: data?.hash });
+
+  /* const createPoem = async (text, price) => {
+*   const create = new Contract(contractAddress, abi, await useAccount().)
+*     .createPoem;
+*   console.log("Creating poem...");
+*   const poemTxn = await create(text, price);
+* };
+ */
   const handleChange = (e: React.ChangeEvent) => {
     const { name, value } = e.target as HTMLInputElement;
     setFormData((fData) => ({
@@ -38,7 +46,8 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createPoem(formData.text, formData.price);
+    write?.()
+    //createPoem(formData.text, formData.price);
   };
 
   return (
@@ -70,10 +79,10 @@ export default function Home() {
         </Section>
         <form onSubmit={handleSubmit}>
           <input
-            name="text"
+            name="poemText"
             type="text"
             onChange={handleChange}
-            value={formData.text}
+            value={formData.poemText}
           />
           <input
             name="price"
@@ -83,6 +92,8 @@ export default function Home() {
           />
           <button>Create Poem</button>
         </form>
+        {isLoading && (<p>Making a poem</p>)}
+        {isSuccess && (<p>Made a poem!</p>)}
       </main>
     </div>
   );
