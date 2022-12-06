@@ -30,7 +30,7 @@ export default function Home() {
 							src="/alchemy_logo.svg"
 						></img>
 					</a>
-					<ConnectButton></ConnectButton>
+					<ConnectButton showBalance={false} />
 				</nav>
 				<div className={styles.logo_container}>
 					<h1 className={styles.logo}>🔮</h1>
