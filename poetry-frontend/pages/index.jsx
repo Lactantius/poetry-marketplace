@@ -1,9 +1,22 @@
 import styles from "../styles/Home.module.css";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import  Panel  from "../components/panels";
-import  Section  from "../layout/section";
+import { useAccount } from "wagmi";
+import Panel from "../components/panels";
+import Section from "../layout/section";
+import alchemy from "../utils/alchemy";
+import abi from "../utils/poetry.json";
 
 export default function Home() {
+	const contractAddress = "0x7eC3A87CcA0bac08514e698Bd503E43C5F175bce";
+	const { address } = useAccount();
+
+	const createPoem = async (text, price) => {
+		const create = new alchemy.Contract(contractAddress, abi, address)
+			.createPoem;
+		console.log("Creating poem...");
+		const poemTxn = await create((poemText = text), (price = price));
+	};
+
 	return (
 		<div>
 			<header className={styles.header_container}>

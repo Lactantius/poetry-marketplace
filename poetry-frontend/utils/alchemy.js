@@ -3,7 +3,7 @@ import process from "process";
 
 const settings = {
 	apiKey: process.env.ALCHEMY_API_KEY,
-	network: Network["ETH_MAINNET"],
+	network: Network.MATIC_MUMBAI,
 };
 
 const alchemy = new Alchemy(settings);
