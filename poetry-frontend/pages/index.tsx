@@ -8,15 +8,17 @@ import Section from "../layout/section";
 import abi from "../utils/poetry.json";
 
 interface CreatePoemVals {
-  text: string;
+  poemText: string;
   price: number;
 }
 
 export default function Home() {
   const [formData, setFormData] = useState<CreatePoemVals>({
-    text: "",
+    poemText: "",
     price: 0,
   } as CreatePoemVals);
+  const [poemText, setPoemText] = useState("");
+  const [price, setPrice] = useState(0);
 
   const contractAddress = "0x7eC3A87CcA0bac08514e698Bd503E43C5F175bce";
   const { address, isConnected } = useAccount();
@@ -24,6 +26,8 @@ export default function Home() {
   const { config } = usePrepareContractWrite({
     address: contractAddress,
     abi: abi.filter(method => method["name"] === "createPoem"),
+    functionName: "createPoem",
+    args: [poemText, price],
   })
   const { data, write } = useContractWrite(config);
 
@@ -81,14 +85,14 @@ export default function Home() {
           <input
             name="poemText"
             type="text"
-            onChange={handleChange}
-            value={formData.poemText}
+            onChange={(e) => setPoemText(e.target.value)}
+            value={poemText}
           />
           <input
             name="price"
             type="number"
-            onChange={handleChange}
-            value={formData.price}
+            onChange={(e) => setPrice(e.target.value)}
+            value={price}
           />
           <button>Create Poem</button>
         </form>
